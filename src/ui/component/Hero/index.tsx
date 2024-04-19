@@ -74,7 +74,7 @@ export default function Hero() {
                             size="small"
                             variant="outlined"
                             aria-label="Enter your style"
-                            placeholder="What's in your mind?"
+                            placeholder="Enter Product ID"
                             inputProps={{
                                 autocomplete: 'on',
                                 ariaLabel: 'Tell us your style!',

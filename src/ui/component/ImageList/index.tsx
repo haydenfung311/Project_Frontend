@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import Container from "@mui/joy/Container";
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart} from "@fortawesome/free-solid-svg-icons";
 import Typography from "@mui/material/Typography";
@@ -17,6 +17,7 @@ type Props ={
 }
 export default function MasonryImageList({dto}:Props) {
     const[getAllProductDtoList, setGetAllProductDtoList] = useState <GetAllProductDto []|undefined> (undefined);
+    const[navigationId, setNavigationId] = useState(null); // State to track which product is being hovered
 
     const fetchAllProducts = async ()=>{
         try {
@@ -26,9 +27,27 @@ export default function MasonryImageList({dto}:Props) {
 
         }
     }
+
+    const navigate = useNavigate();
+
+    const handleClick = (pid) => {
+        // Perform any actions you need
+        console.log(`Product ${pid} clicked`);
+        // Navigate to the desired route
+        navigate(`/product/${pid}`);
+    };
+
     useEffect (() => {
         fetchAllProducts();
     }, []);
+
+    const handleMouseEnter = (pid) => {
+        setNavigationId(pid);
+    };
+
+    const handleMouseLeave = () => {
+        setNavigationId(null);
+    };
 
     return (
         <Container
@@ -38,7 +57,7 @@ export default function MasonryImageList({dto}:Props) {
                 {
                     getAllProductDtoList
                     ? getAllProductDtoList.map((dto) => (
-                    <Link to="/product/:productId/:userId">
+                            <Link to={`/product/${dto.pid}`} onClick={() => handleClick(dto.pid)}>
                     <ImageListItem key={dto.image_url}>
                             <img
                                 srcSet={`${dto.image_url}?w=248&fit=crop&auto=format&dpr=2 2x`}

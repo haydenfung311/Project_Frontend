@@ -43,7 +43,6 @@ export default function Footer() {
                 sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    pt: { xs: 4, sm: 8 },
                     width: '100%',
                     borderColor: 'divider',
                 }}

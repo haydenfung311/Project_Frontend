@@ -1,22 +1,50 @@
-import {useLocation, useParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import NavList from "../../component/NavList";
 import ShowProductDetail from "../../component/ShowProductDetail";
 import Footer from "../../component/Footer";
+import {useEffect, useState} from "react";
+import {ProductDetailDto} from "../../../data/product/ProductDetailDto.ts";
+import LoadingContainer from "../../component/LoadingContainer";
+import Container from "@mui/joy/Container";
+import mockData from "../../component/ShowProductDetail/productdetailresponse.json";
+import *as ProductApi from "../../../api/ProductApi.ts"
 
-type params = {
-    productId: string,
-    userId: string
+type Params = {
+    productId: string
 }
-
-
 export default function ProductDetail() {
-    const params = useParams<params>();
-    const location = useLocation();
+    const [dto, setDto] = useState<ProductDetailDto | undefined>(undefined);
+
+    const {productId} = useParams<Params>()
+    const navigate = useNavigate();
+    const fetchProductDetailDto =async (pid:string) =>{
+        try {
+               const responseDto = await ProductApi.getProductById(pid);
+               setDto (responseDto);
+            } catch (error){
+                navigate("/error");
+
+            }
+    }
+    useEffect(() => {
+        if(productId) {
+            fetchProductDetailDto(productId)
+        }else{
+            navigate("/error");
+        }
+    }, []);
 
     return(
         <div className="product-listing-container">
             <NavList/>
-            <ShowProductDetail/>
+            <Container>
+                {
+                    dto?<ShowProductDetail dto={dto}/>
+                        :<LoadingContainer/>
+                }
+
+            </Container>
+
             <Footer/>
         </div>
     )

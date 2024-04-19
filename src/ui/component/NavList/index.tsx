@@ -12,7 +12,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {useContext} from "react";
+import {UserData} from "../../../data/user/UserData.ts";
+import {LoginUserContext} from "../../../context/LoginUserContext.ts";
+import Stack from "@mui/material/Stack";
+import CircularProgress from '@mui/material/CircularProgress';
+import * as FirebaseAuthService from "../../../authService/FirebaseAuthService.ts"
 
 const logoStyle = {
     width: '100px',
@@ -24,8 +30,49 @@ interface AppAppBarProps {
 }
 
 function AppAppBar() {
+
+    const navigate = useNavigate();
+    const loginUser = useContext<UserData | null | undefined>(LoginUserContext);
     const [open, setOpen] = React.useState(false);
 
+    const renderLoginUser = () =>{
+        if (loginUser){
+            return (
+                <Stack direction ="row" sx={{ marginLeft: 'auto' }}>
+                    <Typography sx={{ color: '#E4000F'}} alignContent={"center"} marginLeft={2}>
+                        {
+                            loginUser.email
+                        }
+                    </Typography>
+                    <Button sx={{ color: '#E4000F', marginLeft: 2, fontWeight:'bold'}} onClick={()=>{
+                        FirebaseAuthService.handleSignOut()
+                    }}>
+                        Logout
+                    </Button>
+                </Stack>
+            )
+        }else if (loginUser === null){
+            return(
+                <Button
+                    variant="text"
+                    size="xsmall"
+                    component="a"
+                    href="/login"
+                    target="_blank"
+                    sx={{ bgcolor: '#E4000F', color: 'yellow', borderRadius: '20px' }}
+                    onClick={()=>{
+                        navigate ("/login")
+                    }}
+                >Sign in
+                </Button>
+            )
+        }else {
+            return(
+                            <CircularProgress color="error" size={20}/>
+
+            )
+        }
+    }
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
     };
@@ -135,32 +182,18 @@ function AppAppBar() {
                             }}
                         >
                             <Link to = "/shoppingcart">
-                            <Tooltip title="Shopping Cart" style={{ color: '#E4000F' }}>
+                            <Tooltip
+                                title="Shopping Cart"
+                                style={{ color: '#E4000F' }}
+                            onClick={() =>{
+                                navigate("/shoppingcart")
+                            }}>
                                 <IconButton>
                                     <ShoppingCartIcon />
                                 </IconButton>
                             </Tooltip>
                             </Link>
-                            <Button
-                                variant="text"
-                                size="xsmall"
-                                component="a"
-                                href="/login"
-                                target="_blank"
-                                style={{ color: '#E4000F' }}
-
-                            >
-                                Sign in
-                            </Button>
-                            <Button
-                                size="xsmall"
-                                component="a"
-                                href="/material-ui/getting-started/templates/sign-up/"
-                                target="_blank"
-                                sx={{ bgcolor: '#E4000F', color: 'yellow', borderRadius: '20px' }}
-                            >
-                                Sign up
-                            </Button>
+                            {renderLoginUser()}
                         </Box>
                         <Box sx={{ display: { sm: '', md: 'none' } }}>
                             <Button
@@ -199,28 +232,9 @@ function AppAppBar() {
                                     <MenuItem onClick={() => scrollToSection('faq')}>FAQ</MenuItem>
                                     <Divider />
                                     <MenuItem>
-                                        <Button
-                                            color="error"
-                                            variant="contained"
-                                            component="a"
-                                            href="/material-ui/getting-started/templates/sign-up/"
-                                            target="_blank"
-                                            sx={{ width: '100%', bgcolor: 'white', color: '#E4000F', border: '1px solid #E4000F' }}
-                                        >
-                                            Sign up
-                                        </Button>
                                     </MenuItem>
                                     <MenuItem>
-                                        <Button
-                                            color="error"
-                                            variant="outlined"
-                                            component="a"
-                                            href="/material-ui/getting-started/templates/sign-in/"
-                                            target="_blank"
-                                            sx={{ width: '100%', bgcolor: '#E4000F', color: 'yellow' }}
-                                        >
-                                            Sign in
-                                        </Button>
+                                        {renderLoginUser()}
                                     </MenuItem>
                                 </Box>
                             </Drawer>
